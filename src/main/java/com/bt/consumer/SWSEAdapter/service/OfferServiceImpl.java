@@ -1,0 +1,54 @@
+package com.bt.consumer.SWSEAdapter.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.bt.consumer.SWSEAdapter.builder.OfferBuilder;
+import com.bt.consumer.SWSEAdapter.dto.Offers;
+import com.bt.consumer.SWSEAdapter.enums.OfferType;
+import com.bt.consumer.SWSEAdapter.enums.PriceType;
+
+@Service
+public class OfferServiceImpl implements OfferService {
+	private static List<Offers> offerList = new ArrayList<>();
+	static {
+		offerList.add(new OfferBuilder().withNameAndPartNum("Broadband Service", "S0123", OfferType.Product)
+				.withPricingDetails(0.0, true, PriceType.OneOff).build());
+		offerList.add(new OfferBuilder().withNameAndPartNum("PSTN Service", "S0124", OfferType.Product)
+				.withPricingDetails(0.0, true, PriceType.OneOff).build());
+		offerList.add(new OfferBuilder().withNameAndPartNum("Contract product", "S0125", OfferType.Product)
+				.withPricingDetails(0.0, true, PriceType.OneOff).build());
+		offerList.add(new OfferBuilder().withNameAndPartNum("BB hub", "S0126", OfferType.Product)
+				.withPricingDetails(0.0, true, PriceType.OneOff).build());
+		offerList.add(new OfferBuilder().withNameAndPartNum("Call Plan product", "S0127", OfferType.Product)
+				.withPricingDetails(0.0, true, PriceType.OneOff).build());
+		offerList.add(new OfferBuilder().withNameAndPartNum("Infinity 12m Base", "S0128", OfferType.Promotion)
+				.withPricingDetails(20.0, true, PriceType.Recurring).build());
+		offerList.add(new OfferBuilder()
+				.withNameAndPartNum("Infinity offer 12 months 3 pounds disocunt", "S0129", OfferType.Promotion)
+				.withPricingDetails(0.0, true, PriceType.Recurring).build());
+		offerList.add(new OfferBuilder()
+				.withNameAndPartNum("Infinity offer 6 months 2 pounds disocunt", "S0130", OfferType.Promotion)
+				.withPricingDetails(0.0, true, PriceType.Recurring).build());
+		offerList.add(new OfferBuilder()
+				.withNameAndPartNum("Infinity offer 18 months 5 pounds disocunt", "S0131", OfferType.Promotion)
+				.withPricingDetails(0.0, true, PriceType.Recurring).build());
+		offerList.add(
+				new OfferBuilder().withNameAndPartNum("Infinity Disc 12 months 3 pounds", "S0132", OfferType.Product)
+						.withPricingDetails(-3.0, true, PriceType.Recurring).build());
+		offerList.add(
+				new OfferBuilder().withNameAndPartNum("Infinity Disc 6 months 2 pounds", "S0133", OfferType.Product)
+						.withPricingDetails(-2.0, true, PriceType.Recurring).build());
+		offerList.add(
+				new OfferBuilder().withNameAndPartNum("Infinity Disc 18 months 5 pounds", "S0134", OfferType.Product)
+						.withPricingDetails(-5.0, true, PriceType.Recurring).build());
+	}
+
+	@Override
+	public List<Offers> getAllOffers() {
+		return offerList;
+	}
+
+}

@@ -1,9 +1,9 @@
 package com.bt.consumer.SWSEAdapter.service;
 
-import com.bt.consumer.SWSEAdapter.dto.UserDto;
+import com.bt.consumer.SWSEAdapter.dto.Customer;
 
 public interface SearchService {
 	
-	UserDto searchByEin(String ein);
+	Customer searchByEin(String ein);
 
 }

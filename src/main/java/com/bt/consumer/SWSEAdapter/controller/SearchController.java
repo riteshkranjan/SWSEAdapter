@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bt.consumer.SWSEAdapter.dto.UserDto;
+import com.bt.consumer.SWSEAdapter.dto.Customer;
 import com.bt.consumer.SWSEAdapter.service.SearchService;
 
 @RestController
@@ -18,7 +18,7 @@ public class SearchController {
 	SearchService service;
 	
 	@GetMapping("/searchByEin/{ein}")
-	public UserDto searchByEin( @PathVariable final String ein) {
+	public Customer searchByEin( @PathVariable final String ein) {
 		logger.info("method searchByEin called with ein " + ein);
 		return service.searchByEin(ein);
 	}

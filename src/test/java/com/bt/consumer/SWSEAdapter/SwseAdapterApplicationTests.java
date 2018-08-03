@@ -11,6 +11,7 @@ public class SwseAdapterApplicationTests {
 
 	@Test
 	public void contextLoads() {
+		System.out.println("Context loaded successFully");
 	}
 
 }
