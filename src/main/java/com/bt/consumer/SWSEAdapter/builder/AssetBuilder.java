@@ -6,8 +6,9 @@ import com.bt.consumer.SWSEAdapter.dto.Assets;
 
 public class AssetBuilder {
 	private Assets a;
-	public AssetBuilder() {
+	public AssetBuilder(int sequenceId) {
 		a = new Assets();
+		a.setSequenceId(sequenceId);
 	}
     public AssetBuilder withAssetDetails(String assetNumber, String product) {
     	a.setAssetNumber(assetNumber);

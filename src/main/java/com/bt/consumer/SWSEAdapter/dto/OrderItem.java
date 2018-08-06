@@ -21,6 +21,7 @@ public class OrderItem implements Serializable{
 	private String serviceId;
 	private String assetIntegId;
 	private String promIntegrationId;
+	private Double price;
 	public String getProduct() {
 		return product;
 	}
@@ -69,6 +70,11 @@ public class OrderItem implements Serializable{
 	public void setPromIntegrationId(String promIntegrationId) {
 		this.promIntegrationId = promIntegrationId;
 	}
+	public Double getPrice() {
+		return price;
+	}
+	public void setPrice(Double price) {
+		this.price = price;
+	}
 	
-
 }

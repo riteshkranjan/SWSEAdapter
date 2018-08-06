@@ -2,14 +2,8 @@ package com.bt.consumer.SWSEAdapter.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.bt.consumer.SWSEAdapter.dto.Customer;
-import com.bt.consumer.SWSEAdapter.dto.SearchResult;
-import com.bt.consumer.SWSEAdapter.service.SearchService;
 
 @RestController
 public class MainController {
@@ -21,7 +15,10 @@ public class MainController {
 		return "Hurray! server is up and running - available methods are : \n"
 				+ "1. /search/{ein} \n"
 				+ "2. /search/{phoneNumber}/{billingActNum} \n"
-				+ "3. /getAllOffers";
+				+ "3. /getAllOffers \n"
+				+ "4. /getAssetDetails/{assetId}\n"
+				+ "5. /addOrderItem/{OrderNumber}\n"
+				+ "6. /addOrderItem/{OrderNumber}/{cadAfter}\n";
 	}
 	
 

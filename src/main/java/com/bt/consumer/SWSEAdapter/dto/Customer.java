@@ -1,7 +1,6 @@
 package com.bt.consumer.SWSEAdapter.dto;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class Customer implements Serializable{
 	
@@ -15,8 +14,8 @@ public class Customer implements Serializable{
 	private String billingSummary;
 	private String contactSummary;
 	private boolean t_b;
-	private Date t_bLastUpdated;
-	private Date lastPromoted;
+	//private Date t_bLastUpdated;
+	/*private Date lastPromoted;
 	private Date registraionDate;
 	private Date ukResidencyDeclareDate;
 	private Date lastContactDate;
@@ -26,7 +25,7 @@ public class Customer implements Serializable{
 	private boolean isHazardWarningNote;
 	private boolean isVATInvoice;
 	private boolean isAnonymous;
-	private String cutomerPhase;
+	private String cutomerPhase;*/
 	public String getEin() {
 		return ein;
 	}
@@ -64,7 +63,7 @@ public class Customer implements Serializable{
 	public void setT_b(boolean t_b) {
 		this.t_b = t_b;
 	}
-	public Date getT_bLastUpdated() {
+	/*public Date getT_bLastUpdated() {
 		return t_bLastUpdated;
 	}
 	public void setT_bLastUpdated(Date t_bLastUpdated) {
@@ -135,5 +134,5 @@ public class Customer implements Serializable{
 	}
 	public void setCutomerPhase(String cutomerPhase) {
 		this.cutomerPhase = cutomerPhase;
-	}
+	}*/
 }

@@ -29,7 +29,7 @@ public class SearchServiceImpl implements SearchService {
 			private static final long serialVersionUID = -7730801334474213507L;
 
 			{
-				add(new AssetBuilder().withAssetDetails("3-3473578826", "Pkg AQ BB+UWC (35.99)(18m)(18m 27 17)")
+				add(new AssetBuilder(1).withAssetDetails("3-3473578826", "Pkg AQ BB+UWC (35.99)(18m)(18m 27 17)")
 						.withContractDetails(null, null, "0202789136").withPromotionIntg("S02345").build());
 			}
 		});
