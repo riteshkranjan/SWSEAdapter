@@ -1,5 +1,7 @@
 package com.bt.consumer.SWSEAdapter.service;
 
+import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,9 +11,16 @@ import org.springframework.stereotype.Service;
 
 import com.bt.consumer.SWSEAdapter.builder.AssetBuilder;
 import com.bt.consumer.SWSEAdapter.builder.CustomerBuilder;
+import com.bt.consumer.SWSEAdapter.controller.MainController;
 import com.bt.consumer.SWSEAdapter.dto.Assets;
 import com.bt.consumer.SWSEAdapter.dto.Customer;
 import com.bt.consumer.SWSEAdapter.dto.SearchResult;
+import com.siebel.CustomUI.Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input;
+import com.siebel.CustomUI.Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output;
+import com.siebel.CustomUI.Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub;
+import com.siebel.CustomUI.Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_ServiceLocator;
+import com.siebel.www.xml.BaseAccount.Account;
+import com.siebel.www.xml.BaseAccount.AssetMgmtAssetOrderMgmt;
 
 @Service
 public class SearchServiceImpl implements SearchService {
@@ -19,6 +28,7 @@ public class SearchServiceImpl implements SearchService {
 	private static final Map<String, Customer> userData = new HashMap<>();
 	private static final Map<String, List<Assets>> assetsData = new HashMap<>();
 	private static final Map<String, String> banToEinMap = new HashMap<>();
+	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	static {
 		userData.put("123456789",
 				new CustomerBuilder().withEin("123456789").with(true).withConsumer("Mr. Jerry Peter")
@@ -43,10 +53,40 @@ public class SearchServiceImpl implements SearchService {
 	}
 
 	@Override
-	public SearchResult search(String phoneNumber, String billingActNum) {
-		String ein = banToEinMap.get(billingActNum);
-		if(ein==null) return null;
+	public SearchResult search(String phoneNumber, String billingActNum) throws Exception {
 		SearchResult s = new SearchResult();
+		if (MainController.WSDL_MODE) {
+			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_ServiceLocator service = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_ServiceLocator();
+			
+			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input input = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input();
+			input.setBillingAccntId(billingActNum);
+			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub stub = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub(new URL("http://blp02b14hsedb01/eai_enu/start.swe?SWEExtSource=WebService&SWEExtCmd=Execute&WSSOAP=1"),service);
+			org.apache.axis.message.SOAPHeaderElement header = new org.apache.axis.message.SOAPHeaderElement("http://siebel.com/webservices", "UsernameToken", "sadmin");
+			stub.setHeader(header);
+			stub.setHeader("http://siebel.com/webservices", "PasswordText", "sadm1nip16");
+			stub.setHeader("http://siebel.com/webservices", "SessionType", "None");
+			
+			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output response = stub
+					.customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1(input);
+			if(response == null ||response.getListOfBaseAccount()==null || response.getListOfBaseAccount().length==0)
+				return s;
+			Account account = response.getListOfBaseAccount()[0];
+			Customer c = new CustomerBuilder().withConsumer(account.getContactId()).build();
+			s.setCustomer(c);
+			AssetMgmtAssetOrderMgmt[] assets = account.getListOfAssetMgmtAssetOrderMgmt();
+			int i = 1;
+			for(AssetMgmtAssetOrderMgmt asset: assets) {
+				Assets a = new AssetBuilder(i++).withAssetDetails(asset.getServiceAccountId(), asset.getProductName())
+						.withPromotionIntg(asset.getIntegrationId())
+						.withContractDetails(sdf.parse(asset.getEffectiveEndDate()), asset.getServiceAccountId(), asset.getBillingAccountId())
+						.build();
+				s.getAssets().add(a);		
+			}
+			return s;
+		}
+		String ein = banToEinMap.get(billingActNum);
+		if (ein == null)
+			return null;
 		s.setCustomer(searchByEin(ein));
 		s.setAssets(assetsData.get(ein));
 		return s;

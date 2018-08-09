@@ -25,7 +25,7 @@ public class SearchServiceImplTest extends SwseAdapterApplicationTests {
 	}
 
 	@Test
-	public void testSearch() {
+	public void testSearch() throws Exception {
 		SearchResult s = service.search("someNumber", "LV11307993");
 		Assert.assertNotNull(s);
 		Customer c = s.getCustomer();

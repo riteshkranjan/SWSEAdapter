@@ -7,6 +7,6 @@ public interface SearchService {
 	
 	Customer searchByEin(String ein);
 
-	SearchResult search(String phoneNumber, String billingActNum);
+	SearchResult search(String phoneNumber, String billingActNum) throws Exception;
 
 }
