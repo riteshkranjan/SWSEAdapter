@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.bt.consumer.SWSEAdapter.builder.AssetBuilder;
@@ -24,7 +25,31 @@ import com.siebel.www.xml.BaseAccount.AssetMgmtAssetOrderMgmt;
 
 @Service
 public class SearchServiceImpl implements SearchService {
+	
+	@Value("${swse.session.type.name}")
+	private String sessionTypeTag;
 
+	@Value("${swse.password.text.name}")
+	private String passwordTextTag;
+
+	@Value("${swse.username.token.name}")
+	private String userNameToken;
+
+	@Value("${swse.header.schema.url}")
+	private String headerSchemaUri;
+
+	@Value("${swse.user.name}")
+    private String userName;
+	
+	@Value("${swse.user.password}")
+    private String password;
+	
+	@Value("${swse.session.type}")
+	private String sessionType;
+	
+	@Value("${swse.url}")
+	private String url;
+	
 	private static final Map<String, Customer> userData = new HashMap<>();
 	private static final Map<String, List<Assets>> assetsData = new HashMap<>();
 	private static final Map<String, String> banToEinMap = new HashMap<>();
@@ -60,11 +85,11 @@ public class SearchServiceImpl implements SearchService {
 			
 			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input input = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input();
 			input.setBillingAccntId(billingActNum);
-			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub stub = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub(new URL("http://blp02b14hsedb01/eai_enu/start.swe?SWEExtSource=WebService&SWEExtCmd=Execute&WSSOAP=1"),service);
-			org.apache.axis.message.SOAPHeaderElement header = new org.apache.axis.message.SOAPHeaderElement("http://siebel.com/webservices", "UsernameToken", "sadmin");
+			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub stub = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub(new URL(url),service);
+			org.apache.axis.message.SOAPHeaderElement header = new org.apache.axis.message.SOAPHeaderElement(headerSchemaUri, userNameToken, userName);
 			stub.setHeader(header);
-			stub.setHeader("http://siebel.com/webservices", "PasswordText", "sadm1nip16");
-			stub.setHeader("http://siebel.com/webservices", "SessionType", "None");
+			stub.setHeader(headerSchemaUri, passwordTextTag, password);
+			stub.setHeader(headerSchemaUri, sessionTypeTag, sessionType);
 			
 			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output response = stub
 					.customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1(input);
