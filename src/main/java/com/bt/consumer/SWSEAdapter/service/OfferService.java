@@ -5,7 +5,9 @@ import java.util.List;
 import com.bt.consumer.SWSEAdapter.dto.Offers;
 
 public interface OfferService {
-	
+
 	public List<Offers> getAllOffers();
+
+	public Offers getDiscount(String productId);
 
 }

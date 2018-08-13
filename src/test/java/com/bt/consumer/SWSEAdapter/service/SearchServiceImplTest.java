@@ -6,12 +6,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.bt.consumer.SWSEAdapter.SwseAdapterApplicationTests;
+import com.bt.consumer.SWSEAdapter.BaseTest;
 import com.bt.consumer.SWSEAdapter.dto.Assets;
 import com.bt.consumer.SWSEAdapter.dto.Customer;
 import com.bt.consumer.SWSEAdapter.dto.SearchResult;
 
-public class SearchServiceImplTest extends SwseAdapterApplicationTests {
+public class SearchServiceImplTest extends BaseTest {
 	@Autowired
 	SearchService service;
 

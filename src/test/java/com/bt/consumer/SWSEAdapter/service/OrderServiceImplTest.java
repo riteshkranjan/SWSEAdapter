@@ -9,7 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.bt.consumer.SWSEAdapter.SwseAdapterApplicationTests;
+import com.bt.consumer.SWSEAdapter.BaseTest;
 import com.bt.consumer.SWSEAdapter.builder.OfferBuilder;
 import com.bt.consumer.SWSEAdapter.dto.Offers;
 import com.bt.consumer.SWSEAdapter.dto.Order;
@@ -21,7 +21,7 @@ import com.bt.consumer.SWSEAdapter.enums.PriceType;
 import com.bt.consumer.SWSEAdapter.enums.Status;
 import com.bt.consumer.SWSEAdapter.enums.Substatus;
 
-public class OrderServiceImplTest extends SwseAdapterApplicationTests {
+public class OrderServiceImplTest extends BaseTest {
 	private static final String ORDER_NUMBER = "VOL013-3554374863";
 	SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
@@ -41,7 +41,7 @@ public class OrderServiceImplTest extends SwseAdapterApplicationTests {
 	 */
 	private void validateOrderItems(List<OrderItem> l) throws ParseException {
 		OrderItem i = l.get(0);
-		Assert.assertEquals(Action.Delete, i.getAction());
+		Assert.assertEquals(Action.None.val, i.getAction());
 		Assert.assertEquals(sdf.parse("08/12/2017 06:23:14").getTime(), i.getCustomerAgreedDate().getTime());
 		Assert.assertNull(i.getPrice());
 		Assert.assertNull(i.getServiceId());
@@ -52,7 +52,7 @@ public class OrderServiceImplTest extends SwseAdapterApplicationTests {
 		Assert.assertEquals(Substatus.InProgress, i.getSubStatus());
 
 		i = l.get(1);
-		Assert.assertEquals(Action.Update, i.getAction());
+		Assert.assertEquals(Action.None.val, i.getAction());
 		Assert.assertEquals(sdf.parse("08/12/2017 06:23:14").getTime(), i.getCustomerAgreedDate().getTime());
 		Assert.assertEquals(0.0, i.getPrice().doubleValue(), 0.0);
 		Assert.assertEquals(Status.Pending, i.getStatus());
@@ -65,7 +65,7 @@ public class OrderServiceImplTest extends SwseAdapterApplicationTests {
 	}
 
 	@Test
-	public void testAddOrderItem() throws ParseException {
+	public void testAddOrderItem() throws Exception {
 		int expectedOrderItemSize = 4;
 		OrderDetails assetDetails = service.getAssetDetails("3-3473578826");
 		Order o = assetDetails.getOrder();
@@ -89,11 +89,11 @@ public class OrderServiceImplTest extends SwseAdapterApplicationTests {
 		Assert.assertEquals(Status.Pending, o.getStatus());
 		Assert.assertEquals(Substatus.InProgress, o.getSubStatus());
 		l = assetDetails.getOrderItems();
-		Assert.assertEquals(expectedOrderItemSize + 1, l.size());
+		Assert.assertEquals(++expectedOrderItemSize, l.size());
 		validateOrderItems(l);
 
 		OrderItem i = l.get(4);
-		Assert.assertEquals(Action.Add, i.getAction());
+		Assert.assertEquals(Action.Add.val, i.getAction());
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DAY_OF_MONTH, 5);
 		Assert.assertTrue((i.getCustomerAgreedDate().getTime() - c.getTimeInMillis()) <= 100);
@@ -101,6 +101,23 @@ public class OrderServiceImplTest extends SwseAdapterApplicationTests {
 		Assert.assertEquals(Status.Pending, i.getStatus());
 		Assert.assertEquals("Call Plan UAC", i.getProduct());
 		Assert.assertEquals(Substatus.InProgress, i.getSubStatus());
+		
+		offers = new OfferBuilder().withNameAndPartNum("Infinity offer 12 months 3 pounds disocunt", "S0129", OfferType.Product)
+				.withPricingDetails(10.0, true, PriceType.Recurring).build();
+		service.addOrderItem(ORDER_NUMBER, offers, 5);
+		assetDetails = service.getAssetDetails("3-3473578826");
+		o = assetDetails.getOrder();
+		l = assetDetails.getOrderItems();
+		Assert.assertEquals(expectedOrderItemSize + 2, l.size());
+		validateOrderItems(l);
+
+		i = l.get(5);
+		Assert.assertEquals(Action.Add.val, i.getAction());
+		Assert.assertEquals("Infinity offer 12 months 3 pounds disocunt", i.getProduct());
+		
+		i = l.get(6);
+		Assert.assertEquals(Action.Add.val, i.getAction());
+		Assert.assertEquals("Infinity Disc 12 months 3 pounds", i.getProduct());
 	}
 
 }

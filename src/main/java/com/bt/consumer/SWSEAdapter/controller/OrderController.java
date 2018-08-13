@@ -27,7 +27,7 @@ public class OrderController {
 	OrderService orderService;
 
 	@GetMapping("/getAllOffers")
-	public List<Offers> searchByEin() {
+	public List<Offers> getAllOffers() {
 		logger.info("method getAllOffers called ");
 		return service.getAllOffers();
 	}
@@ -39,16 +39,16 @@ public class OrderController {
 	}
 
 	@PostMapping("/addOrderItem/{orderNumber}")
-	public void addOrderItem(@PathVariable final String orderNumber, @RequestBody final Offers o) {
+	public String addOrderItem(@PathVariable final String orderNumber, @RequestBody final Offers o) throws Exception {
 		logger.info("method addOrderItem called for  OrderNumber = " + orderNumber);
-		orderService.addOrderItem(orderNumber, o, 5);
+		return orderService.addOrderItem(orderNumber, o, 5);
 	}
 
 	@PostMapping("/addOrderItem/{orderNumber}/{cadAfter}")
-	public void addOrderItem(@PathVariable final String orderNumber, @PathVariable final int cadAfter,
-			@RequestBody final Offers o) {
+	public String addOrderItem(@PathVariable final String orderNumber, @PathVariable final int cadAfter,
+			@RequestBody final Offers o) throws Exception {
 		logger.info(String.format("method addOrderItem called for  OrderNumber = %s and Customer Agreed after %d days",
-				orderNumber, cadAfter < 0 ? 5 : cadAfter));
-		orderService.addOrderItem(orderNumber, o, cadAfter);
+				orderNumber, cadAfter));
+		return orderService.addOrderItem(orderNumber, o, cadAfter < 0 ? 5 : cadAfter);
 	}
 }

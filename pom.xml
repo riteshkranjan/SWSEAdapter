@@ -113,6 +113,12 @@
 						<goals>
 							<goal>report</goal>
 						</goals>
+						<configuration>
+							<excludes>
+								<exclude>*Test</exclude>
+								<exclude>com/siebel/**/*</exclude>
+							</excludes>
+						</configuration>
 					</execution>
 					<execution>
 						<id>default-check</id>
@@ -120,17 +126,18 @@
 							<goal>check</goal>
 						</goals>
 						<configuration>
+							<excludes>
+								<exclude>*Test</exclude>
+								<exclude>com/siebel/**/*</exclude>
+							</excludes>
 							<rules>
 								<rule>
 									<element>BUNDLE</element>
-									<excludes>
-										<exclude>*Test</exclude>
-									</excludes>
 									<limits>
 										<limit>
 											<counter>INSTRUCTION</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0.01</minimum>
+											<minimum>0.80</minimum>
 										</limit>
 									</limits>
 								</rule>

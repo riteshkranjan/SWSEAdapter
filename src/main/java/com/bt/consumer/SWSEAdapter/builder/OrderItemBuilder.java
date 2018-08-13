@@ -27,7 +27,7 @@ public class OrderItemBuilder {
 
 	public OrderItemBuilder withNewOfferDetails(Offers offer, Date cad) {
 		o.setProduct(offer.getName());
-		o.setAction(Action.Add);
+		o.setAction(Action.Add.val());
 		o.setPrice(offer.getPrice());
 		o.setStatus(Status.Pending);
 		o.setSubStatus(Substatus.InProgress);
@@ -52,7 +52,7 @@ public class OrderItemBuilder {
 	}
 
 	public OrderItemBuilder withAction(Action action) {
-		o.setAction(action);
+		o.setAction(action.val());
 		return this;
 	}
 

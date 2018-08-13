@@ -3,7 +3,6 @@ package com.bt.consumer.SWSEAdapter.dto;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.bt.consumer.SWSEAdapter.enums.Action;
 import com.bt.consumer.SWSEAdapter.enums.Status;
 import com.bt.consumer.SWSEAdapter.enums.Substatus;
 
@@ -14,7 +13,7 @@ public class OrderItem implements Serializable{
 	 */
 	private static final long serialVersionUID = -6479522378499332622L;
 	private String product;
-	private Action action;
+	private String action;
 	private Date customerAgreedDate;
 	private Status status;
 	private Substatus subStatus;
@@ -28,10 +27,10 @@ public class OrderItem implements Serializable{
 	public void setProduct(String product) {
 		this.product = product;
 	}
-	public Action getAction() {
+	public String getAction() {
 		return action;
 	}
-	public void setAction(Action action) {
+	public void setAction(String action) {
 		this.action = action;
 	}
 	public Date getCustomerAgreedDate() {

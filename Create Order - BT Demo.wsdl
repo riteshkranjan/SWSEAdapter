@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="http://siebel.com/CustomUI"
+	xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="http://siebel.com/CustomUI">
+	<types>
+		<xsd:schema elementFormDefault="qualified"
+			attributeFormDefault="unqualified" targetNamespace="http://siebel.com/CustomUI"
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:element name="Create_spcOrder_spc-_spcBT_spcDemo_Input">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Product_spcId" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="Create_spcOrder_spc-_spcBT_spcDemo_Output">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="OrderNumber" type="xsd:string"></xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:schema>
+	</types>
+	<message name="Create_spcOrder_spc-_spcBT_spcDemo_Input">
+		<part name="Create_spcOrder_spc-_spcBT_spcDemo_Input" element="tns:Create_spcOrder_spc-_spcBT_spcDemo_Input"></part>
+	</message>
+	<message name="Create_spcOrder_spc-_spcBT_spcDemo_Output">
+		<part name="Create_spcOrder_spc-_spcBT_spcDemo_Output" element="tns:Create_spcOrder_spc-_spcBT_spcDemo_Output"></part>
+	</message>
+	<portType name="Create_spcOrder_spc-_spcBT_spcDemo">
+		<operation name="Create_spcOrder_spc-_spcBT_spcDemo">
+			<input message="tns:Create_spcOrder_spc-_spcBT_spcDemo_Input"></input>
+			<output message="tns:Create_spcOrder_spc-_spcBT_spcDemo_Output"></output>
+		</operation>
+	</portType>
+	<binding name="Create_spcOrder_spc-_spcBT_spcDemo" type="tns:Create_spcOrder_spc-_spcBT_spcDemo">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"
+			style="document"></soap:binding>
+		<operation name="Create_spcOrder_spc-_spcBT_spcDemo">
+			<soap:operation
+				soapAction="document/http://siebel.com/CustomUI:Create_spcOrder_spc-_spcBT_spcDemo"></soap:operation>
+			<input>
+				<soap:body use="literal"></soap:body>
+			</input>
+			<output>
+				<soap:body use="literal"></soap:body>
+			</output>
+		</operation>
+	</binding>
+	<service name="Create_spcOrder_spc-_spcBT_spcDemo">
+		<port binding="tns:Create_spcOrder_spc-_spcBT_spcDemo" name="Create_spcOrder_spc-_spcBT_spcDemo">
+			<soap:address
+				location="http://blp02b14hsedb01/eai_enu/start.swe?SWEExtSource=WebService&amp;SWEExtCmd=Execute&amp;WSSOAP=1"></soap:address>
+		</port>
+	</service>
+</definitions>
