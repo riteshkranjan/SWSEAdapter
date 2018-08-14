@@ -1,6 +1,5 @@
 package com.bt.consumer.SWSEAdapter.service;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -9,7 +8,6 @@ import java.util.Map;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.bt.consumer.SWSEAdapter.builder.OrderBuilder;
@@ -32,30 +30,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Autowired
 	OfferService offerService;
-
-	@Value("${swse.session.type.name}")
-	private String sessionTypeTag;
-
-	@Value("${swse.password.text.name}")
-	private String passwordTextTag;
-
-	@Value("${swse.username.token.name}")
-	private String userNameToken;
-
-	@Value("${swse.header.schema.url}")
-	private String headerSchemaUri;
-
-	@Value("${swse.user.name}")
-	private String userName;
-
-	@Value("${swse.user.password}")
-	private String password;
-
-	@Value("${swse.session.type}")
-	private String sessionType;
-
-	@Value("${swse.url}")
-	private String url;
+	
+	@Autowired
+	SWSEStubBuilder stubBuilder;
 
 	private static Map<String, Order> assetToOrderMap = new HashMap<>();
 	private static Map<String, List<OrderItem>> orderToOrderItemsMap = new HashMap<>();
@@ -89,6 +66,13 @@ public class OrderServiceImpl implements OrderService {
 	public OrderDetails getAssetDetails(String assetId) {
 		OrderDetails details = new OrderDetails();
 		Order o = assetToOrderMap.get(assetId);
+		if (MainController.WSDL_MODE && o == null) {
+			/*
+			 * hardcoding get asset details here as siebel developers are very busy to expose this api to us. 
+			 * needed something to display on screen hence harcoding
+			*/ 
+			o = assetToOrderMap.get("3-3473578826");
+		}
 		details.setOrder(o);
 		details.setOrderItems(orderToOrderItemsMap.get(o.getOrderNumber()));
 		return details;
@@ -114,11 +98,7 @@ public class OrderServiceImpl implements OrderService {
 
 	private String createOrderAtSiebel(String productId) throws Exception {
 		Create_spcOrder_spc_spcBT_spcDemo_ServiceLocator service = new Create_spcOrder_spc_spcBT_spcDemo_ServiceLocator();
-		Create_spcOrder_spc_spcBT_spcDemo_BindingStub stub = new Create_spcOrder_spc_spcBT_spcDemo_BindingStub(
-				new URL(url), service);
-		stub.setHeader(headerSchemaUri, userNameToken, userName);
-		stub.setHeader(headerSchemaUri, passwordTextTag, password);
-		stub.setHeader(headerSchemaUri, sessionTypeTag, sessionType);
+		Create_spcOrder_spc_spcBT_spcDemo_BindingStub stub = (Create_spcOrder_spc_spcBT_spcDemo_BindingStub) stubBuilder.getStub(service);
 		Create_spcOrder_spc_spcBT_spcDemo_Input input = new Create_spcOrder_spc_spcBT_spcDemo_Input();
 		input.setProduct_spcId(productId);
 		Create_spcOrder_spc_spcBT_spcDemo_Output output = stub.create_spcOrder_spc_spcBT_spcDemo(input);

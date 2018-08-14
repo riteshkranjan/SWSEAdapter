@@ -1,13 +1,12 @@
 package com.bt.consumer.SWSEAdapter.service;
 
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bt.consumer.SWSEAdapter.builder.AssetBuilder;
@@ -25,31 +24,10 @@ import com.siebel.www.xml.BaseAccount.AssetMgmtAssetOrderMgmt;
 
 @Service
 public class SearchServiceImpl implements SearchService {
-	
-	@Value("${swse.session.type.name}")
-	private String sessionTypeTag;
 
-	@Value("${swse.password.text.name}")
-	private String passwordTextTag;
+	@Autowired
+	SWSEStubBuilder stubBuilder;
 
-	@Value("${swse.username.token.name}")
-	private String userNameToken;
-
-	@Value("${swse.header.schema.url}")
-	private String headerSchemaUri;
-
-	@Value("${swse.user.name}")
-    private String userName;
-	
-	@Value("${swse.user.password}")
-    private String password;
-	
-	@Value("${swse.session.type}")
-	private String sessionType;
-	
-	@Value("${swse.url}")
-	private String url;
-	
 	private static final Map<String, Customer> userData = new HashMap<>();
 	private static final Map<String, List<Assets>> assetsData = new HashMap<>();
 	private static final Map<String, String> banToEinMap = new HashMap<>();
@@ -82,30 +60,29 @@ public class SearchServiceImpl implements SearchService {
 		SearchResult s = new SearchResult();
 		if (MainController.WSDL_MODE) {
 			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_ServiceLocator service = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_ServiceLocator();
-			
+
 			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input input = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input();
 			input.setBillingAccntId(billingActNum);
-			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub stub = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub(new URL(url),service);
-			org.apache.axis.message.SOAPHeaderElement header = new org.apache.axis.message.SOAPHeaderElement(headerSchemaUri, userNameToken, userName);
-			stub.setHeader(header);
-			stub.setHeader(headerSchemaUri, passwordTextTag, password);
-			stub.setHeader(headerSchemaUri, sessionTypeTag, sessionType);
-			
+			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub stub = (Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub) stubBuilder
+					.getStub(service);
+
 			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output response = stub
 					.customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1(input);
-			if(response == null ||response.getListOfBaseAccount()==null || response.getListOfBaseAccount().length==0)
+			if (response == null || response.getListOfBaseAccount() == null
+					|| response.getListOfBaseAccount().length == 0)
 				return s;
 			Account account = response.getListOfBaseAccount()[0];
 			Customer c = new CustomerBuilder().withConsumer(account.getContactId()).build();
 			s.setCustomer(c);
 			AssetMgmtAssetOrderMgmt[] assets = account.getListOfAssetMgmtAssetOrderMgmt();
 			int i = 1;
-			for(AssetMgmtAssetOrderMgmt asset: assets) {
+			for (AssetMgmtAssetOrderMgmt asset : assets) {
 				Assets a = new AssetBuilder(i++).withAssetDetails(asset.getServiceAccountId(), asset.getProductName())
 						.withPromotionIntg(asset.getIntegrationId())
-						.withContractDetails(sdf.parse(asset.getEffectiveEndDate()), asset.getServiceAccountId(), asset.getBillingAccountId())
+						.withContractDetails(sdf.parse(asset.getEffectiveEndDate()), asset.getServiceAccountId(),
+								asset.getBillingAccountId())
 						.build();
-				s.getAssets().add(a);		
+				s.getAssets().add(a);
 			}
 			return s;
 		}
