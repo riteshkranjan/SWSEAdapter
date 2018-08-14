@@ -96,8 +96,9 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public String addOrderItem(String orderNumber, Offers o, int cadAfter) throws Exception {
+		String orderId = "1-" + new Random().nextInt(10000);
 		if (MainController.WSDL_MODE) {
-			return createOrderAtSiebel("1-XHCR");
+			orderId =  createOrderAtSiebel("1-XHCR");
 		}
 		List<OrderItem> orderItems = orderToOrderItemsMap.get(orderNumber);
 		Calendar c = Calendar.getInstance();
@@ -107,7 +108,7 @@ public class OrderServiceImpl implements OrderService {
 		if (discount != null)
 			orderItems.add(new OrderItemBuilder().withNewOfferDetails(discount, c.getTime()).build());
 
-		return "1-" + new Random().nextInt(10000);
+		return orderId;
 
 	}
 
