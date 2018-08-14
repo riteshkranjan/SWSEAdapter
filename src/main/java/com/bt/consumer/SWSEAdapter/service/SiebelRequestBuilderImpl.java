@@ -1,19 +1,15 @@
 package com.bt.consumer.SWSEAdapter.service;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 
 import org.apache.axis.AxisFault;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.siebel.CustomUI.Create_spcOrder_spc_spcBT_spcDemo_BindingStub;
-import com.siebel.CustomUI.Create_spcOrder_spc_spcBT_spcDemo_ServiceLocator;
-import com.siebel.CustomUI.Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub;
 
 @Service
-public class SWSEStubBuilder {
-
+public abstract class SiebelRequestBuilderImpl <E extends org.apache.axis.client.Stub, K extends org.apache.axis.client.Service> implements SiebelRequestBuilder<E, K>{
+	
 	@Value("${swse.session.type.name}")
 	private String sessionTypeTag;
 
@@ -34,32 +30,25 @@ public class SWSEStubBuilder {
 
 	@Value("${swse.session.type}")
 	private String sessionType;
+	
+	private E stub;
 
-	@Value("${swse.url}")
-	private String url;
-
-	public org.apache.axis.client.Stub getStub(
-			org.apache.axis.client.Service service)
-			throws AxisFault, MalformedURLException {
-		org.apache.axis.client.Stub stub = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub(
-				new URL(url), service);
+	public void authenticate() throws AxisFault, MalformedURLException{
+		stub = init();
 		addHeader(stub);
+	}
+	
+	public E getSiebelService() throws AxisFault, MalformedURLException {
+		authenticate();
 		return stub;
 	}
 	
-
 	private void addHeader(org.apache.axis.client.Stub stub) {
 		stub.setHeader(headerSchemaUri, userNameToken, userName);
 		stub.setHeader(headerSchemaUri, passwordTextTag, password);
 		stub.setHeader(headerSchemaUri, sessionTypeTag, sessionType);
 	}
 
-
-	public org.apache.axis.client.Stub getStub(
-			Create_spcOrder_spc_spcBT_spcDemo_ServiceLocator service) throws AxisFault, MalformedURLException {
-		org.apache.axis.client.Stub stub = new Create_spcOrder_spc_spcBT_spcDemo_BindingStub(
-				new URL(url), service);
-		addHeader(stub);
-		return stub;
-	}
+	protected abstract java.io.Serializable hitSiebel(java.io.Serializable input) throws Exception;
+	
 }

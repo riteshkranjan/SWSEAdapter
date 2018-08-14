@@ -1,12 +1,16 @@
 package com.bt.consumer.SWSEAdapter.service;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.axis.AxisFault;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.bt.consumer.SWSEAdapter.builder.AssetBuilder;
@@ -23,10 +27,12 @@ import com.siebel.www.xml.BaseAccount.Account;
 import com.siebel.www.xml.BaseAccount.AssetMgmtAssetOrderMgmt;
 
 @Service
-public class SearchServiceImpl implements SearchService {
+public class SearchServiceImpl extends
+		SiebelRequestBuilderImpl<Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub, Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_ServiceLocator>
+		implements SearchService {
 
-	@Autowired
-	SWSEStubBuilder stubBuilder;
+	@Value("${swse.url}")
+	private String url;
 
 	private static final Map<String, Customer> userData = new HashMap<>();
 	private static final Map<String, List<Assets>> assetsData = new HashMap<>();
@@ -59,15 +65,10 @@ public class SearchServiceImpl implements SearchService {
 	public SearchResult search(String phoneNumber, String billingActNum) throws Exception {
 		SearchResult s = new SearchResult();
 		if (MainController.WSDL_MODE) {
-			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_ServiceLocator service = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_ServiceLocator();
-
 			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input input = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input();
 			input.setBillingAccntId(billingActNum);
-			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub stub = (Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub) stubBuilder
-					.getStub(service);
-
-			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output response = stub
-					.customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1(input);
+			Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output response = (Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output) hitSiebel(
+					input);
 			if (response == null || response.getListOfBaseAccount() == null
 					|| response.getListOfBaseAccount().length == 0)
 				return s;
@@ -90,8 +91,21 @@ public class SearchServiceImpl implements SearchService {
 		if (ein == null)
 			return null;
 		s.setCustomer(searchByEin(ein));
-		s.setAssets(assetsData.get(ein));
+		s.setAssets(assetsData.get(ein)); 
 		return s;
 	}
 
+	@Override
+	protected java.io.Serializable hitSiebel(java.io.Serializable input)
+			throws AxisFault, MalformedURLException, RemoteException {
+		return getSiebelService().customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1(
+				(Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input) input);
+	}
+
+	@Override
+	public Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub init()
+			throws AxisFault, MalformedURLException {
+		return new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_BindingStub(new URL(url),
+				new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_ServiceLocator());
+	}
 }

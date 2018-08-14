@@ -1,5 +1,7 @@
 package com.bt.consumer.SWSEAdapter.service;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -7,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.axis.AxisFault;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.bt.consumer.SWSEAdapter.builder.OrderBuilder;
@@ -26,13 +30,15 @@ import com.siebel.CustomUI.Create_spcOrder_spc_spcBT_spcDemo_Output;
 import com.siebel.CustomUI.Create_spcOrder_spc_spcBT_spcDemo_ServiceLocator;
 
 @Service
-public class OrderServiceImpl implements OrderService {
+public class OrderServiceImpl extends
+		SiebelRequestBuilderImpl<Create_spcOrder_spc_spcBT_spcDemo_BindingStub, Create_spcOrder_spc_spcBT_spcDemo_ServiceLocator>
+		implements OrderService {
 
 	@Autowired
 	OfferService offerService;
-	
-	@Autowired
-	SWSEStubBuilder stubBuilder;
+
+	@Value("${swse.url}")
+	private String url;
 
 	private static Map<String, Order> assetToOrderMap = new HashMap<>();
 	private static Map<String, List<OrderItem>> orderToOrderItemsMap = new HashMap<>();
@@ -68,9 +74,9 @@ public class OrderServiceImpl implements OrderService {
 		Order o = assetToOrderMap.get(assetId);
 		if (MainController.WSDL_MODE && o == null) {
 			/*
-			 * hardcoding get asset details here as siebel developers are very busy to expose this api to us. 
-			 * needed something to display on screen hence harcoding
-			*/ 
+			 * hardcoding get asset details here as siebel developers are very busy to
+			 * expose this api to us. needed something to display on screen hence harcoding
+			 */
 			o = assetToOrderMap.get("3-3473578826");
 		}
 		details.setOrder(o);
@@ -82,7 +88,9 @@ public class OrderServiceImpl implements OrderService {
 	public String addOrderItem(String orderNumber, Offers o, int cadAfter) throws Exception {
 		String orderId = "1-" + new Random().nextInt(10000);
 		if (MainController.WSDL_MODE) {
-			orderId =  createOrderAtSiebel("1-XHCR");
+			Create_spcOrder_spc_spcBT_spcDemo_Input input = new Create_spcOrder_spc_spcBT_spcDemo_Input();
+			input.setProduct_spcId("1-XHCR");
+			orderId = ((Create_spcOrder_spc_spcBT_spcDemo_Output) hitSiebel(input)).getOrderNumber();
 		}
 		List<OrderItem> orderItems = orderToOrderItemsMap.get(orderNumber);
 		Calendar c = Calendar.getInstance();
@@ -96,12 +104,14 @@ public class OrderServiceImpl implements OrderService {
 
 	}
 
-	private String createOrderAtSiebel(String productId) throws Exception {
+	@Override
+	protected java.io.Serializable hitSiebel(java.io.Serializable input) throws Exception {
+		return getSiebelService().create_spcOrder_spc_spcBT_spcDemo((Create_spcOrder_spc_spcBT_spcDemo_Input) input);
+	}
+
+	@Override
+	public Create_spcOrder_spc_spcBT_spcDemo_BindingStub init() throws AxisFault, MalformedURLException {
 		Create_spcOrder_spc_spcBT_spcDemo_ServiceLocator service = new Create_spcOrder_spc_spcBT_spcDemo_ServiceLocator();
-		Create_spcOrder_spc_spcBT_spcDemo_BindingStub stub = (Create_spcOrder_spc_spcBT_spcDemo_BindingStub) stubBuilder.getStub(service);
-		Create_spcOrder_spc_spcBT_spcDemo_Input input = new Create_spcOrder_spc_spcBT_spcDemo_Input();
-		input.setProduct_spcId(productId);
-		Create_spcOrder_spc_spcBT_spcDemo_Output output = stub.create_spcOrder_spc_spcBT_spcDemo(input);
-		return output.getOrderNumber();
+		return new Create_spcOrder_spc_spcBT_spcDemo_BindingStub(new URL(url), service);
 	}
 }
