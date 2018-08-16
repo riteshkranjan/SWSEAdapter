@@ -57,6 +57,14 @@ public class Assets implements Serializable{
 	}
 	public void setPromotionInteg(String promotionInteg) {
 		this.promotionInteg = promotionInteg;
+	}
+	@Override
+	public String toString() {
+		return "Assets [sequenceId=" + sequenceId + ", assetNumber=" + assetNumber + ", product=" + product
+				+ ", contractEndDate=" + contractEndDate + ", serviceId=" + serviceId + ", billingAccountNo="
+				+ billingAccountNo + ", promotionInteg=" + promotionInteg + "]";
 	} 
+	
+	
 
 }

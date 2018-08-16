@@ -7,6 +7,8 @@
 
 package com.siebel.CustomUI;
 
+import java.util.Arrays;
+
 public class Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output  implements java.io.Serializable {
     private com.siebel.www.xml.BaseAccount.Account[] listOfBaseAccount;
 
@@ -123,5 +125,13 @@ public class Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output  imple
           new  org.apache.axis.encoding.ser.BeanDeserializer(
             _javaType, _xmlType, typeDesc);
     }
+
+	@Override
+	public String toString() {
+		return "Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output [listOfBaseAccount="
+				+ Arrays.toString(listOfBaseAccount) + "]";
+	}
+    
+    
 
 }

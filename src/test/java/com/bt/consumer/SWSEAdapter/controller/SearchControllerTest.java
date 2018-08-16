@@ -36,24 +36,7 @@ public class SearchControllerTest {
 	
 	
 
-	@Test
-	public void testSearchString() throws Exception {
-		final String EIN = "987654321";
-		final Customer customer = new CustomerBuilder().withEin(EIN).with(true).withConsumer("Jerry")
-		.withSummaries("somecustomersummary", "",
-				"somecontactsummary")
-		.build();
-		Mockito.when(
-				service.searchByEin(EIN)).thenReturn(customer);
-
-		
-		MvcResult result = mockMvc.perform(get("/search/{ein}", EIN))
-	            .andExpect(status().isOk()).andReturn();
-		
-		String expected = "{\"ein\":\"987654321\",\"consumer\":\"Jerry\",\"customerSummary\":\"somecustomersummary\",\"billingSummary\":\"\",\"contactSummary\":\"somecontactsummary\",\"t_b\":true}";
-		JSONAssert.assertEquals(expected, result.getResponse().getContentAsString(), true);
-	}
-
+	
 	@Test
 	public void testSearchStringString() throws Exception {
 		final String billingActNum = "987654321";

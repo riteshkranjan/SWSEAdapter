@@ -75,5 +75,11 @@ public class OrderItem implements Serializable{
 	public void setPrice(Double price) {
 		this.price = price;
 	}
+	@Override
+	public String toString() {
+		return "OrderItem [product=" + product + ", action=" + action + ", customerAgreedDate=" + customerAgreedDate
+				+ ", status=" + status + ", subStatus=" + subStatus + ", serviceId=" + serviceId + ", assetIntegId="
+				+ assetIntegId + ", promIntegrationId=" + promIntegrationId + ", price=" + price + "]";
+	}
 	
 }

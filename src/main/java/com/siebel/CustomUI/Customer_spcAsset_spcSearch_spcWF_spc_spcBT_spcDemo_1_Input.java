@@ -116,4 +116,11 @@ public class Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input  implem
             _javaType, _xmlType, typeDesc);
     }
 
+	@Override
+	public String toString() {
+		return "Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input [billingAccntId=" + billingAccntId + "]";
+	}
+    
+    
+
 }

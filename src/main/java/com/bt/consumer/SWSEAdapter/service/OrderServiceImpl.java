@@ -3,24 +3,23 @@ package com.bt.consumer.SWSEAdapter.service;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 
 import org.apache.axis.AxisFault;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.bt.consumer.SWSEAdapter.builder.AssetBuilder;
 import com.bt.consumer.SWSEAdapter.builder.OrderBuilder;
-import com.bt.consumer.SWSEAdapter.builder.OrderItemBuilder;
-import com.bt.consumer.SWSEAdapter.controller.MainController;
+import com.bt.consumer.SWSEAdapter.dto.Assets;
 import com.bt.consumer.SWSEAdapter.dto.Offers;
-import com.bt.consumer.SWSEAdapter.dto.Order;
 import com.bt.consumer.SWSEAdapter.dto.OrderDetails;
 import com.bt.consumer.SWSEAdapter.dto.OrderItem;
+import com.bt.consumer.SWSEAdapter.dto.SearchResult;
 import com.bt.consumer.SWSEAdapter.enums.Action;
 import com.bt.consumer.SWSEAdapter.enums.Status;
 import com.bt.consumer.SWSEAdapter.enums.Substatus;
@@ -34,79 +33,94 @@ public class OrderServiceImpl extends
 		SiebelRequestBuilderImpl<Create_spcOrder_spc_spcBT_spcDemo_BindingStub, Create_spcOrder_spc_spcBT_spcDemo_ServiceLocator>
 		implements OrderService {
 
+	private static final Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
+
 	@Autowired
 	OfferService offerService;
 
 	@Value("${swse.url}")
 	private String url;
 
-	private static Map<String, Order> assetToOrderMap = new HashMap<>();
-	private static Map<String, List<OrderItem>> orderToOrderItemsMap = new HashMap<>();
-	static {
-		assetToOrderMap.put("3-3473578826",
-				new OrderBuilder().withOrderDetails("0202789136", "Mr. Jerry Peter", "VOL013-3554374863")
-						.withOrderStatus(Status.Pending, Substatus.InProgress).build());
-		OrderItem o1 = new OrderItemBuilder().withAction(Action.None)
-				.withOrderStatus(Status.Pending, Substatus.InProgress).withCAD("08/12/2017 06:23:14")
-				.withOrderDetails("some-value1", "Call Plan UWC", "some-intg-value1", null).build();
-		OrderItem o2 = new OrderItemBuilder().withAction(Action.None)
-				.withOrderStatus(Status.Pending, Substatus.InProgress).withCAD("08/12/2017 06:23:14")
-				.withOrderDetails("some-value2", "Customer PSTN Service", "some-intg-value2", "01154329426")
-				.withPrice(0.0).build();
-		OrderItem o3 = new OrderItemBuilder().withAction(Action.None)
-				.withOrderStatus(Status.Pending, Substatus.InProgress).withCAD("08/12/2017 06:23:14")
-				.withOrderDetails("some-value3", "BB Access Service", "some-intg-value3", "01154329426").withPrice(0.0)
-				.build();
-		OrderItem o4 = new OrderItemBuilder().withAction(Action.None)
-				.withOrderStatus(Status.Pending, Substatus.InProgress).withCAD("08/12/2017 06:23:14")
-				.withOrderDetails("some-value4", "Multi Play", "some-intg-value4", null).withPrice(0.0).build();
-		List<OrderItem> l = new ArrayList<>();
-		l.add(o1);
-		l.add(o2);
-		l.add(o3);
-		l.add(o4);
-		orderToOrderItemsMap.put("VOL013-3554374863", l);
-	}
-
 	@Override
 	public OrderDetails getAssetDetails(String assetId) {
 		OrderDetails details = new OrderDetails();
-		Order o = assetToOrderMap.get(assetId);
-		if (MainController.WSDL_MODE && o == null) {
-			/*
-			 * hardcoding get asset details here as siebel developers are very busy to
-			 * expose this api to us. needed something to display on screen hence harcoding
-			 */
-			o = assetToOrderMap.get("3-3473578826");
-		}
-		details.setOrder(o);
-		details.setOrderItems(orderToOrderItemsMap.get(o.getOrderNumber()));
+		List<OrderItem> orderItems = getOrderItems(assetId);
+		details.setOrderItems(orderItems);
+		details.setOrder(new OrderBuilder()
+				.withOrderDetails("", "", SearchServiceImpl.ORDER_ID.equals("") ? assetId : SearchServiceImpl.ORDER_ID)
+				.build());
 		return details;
+	}
+
+	private List<OrderItem> getOrderItems(String assetId) {
+		SearchResult searchResult = SearchServiceImpl.searchResult.get(assetId);
+		List<Assets> assets = searchResult.getAssets();
+
+		List<OrderItem> orderItems = new ArrayList<>();
+		for (Assets a : assets) {
+			OrderItem o = assetToOrderItemMapping(a, Action.None.val);
+			orderItems.add(o);
+		}
+		return orderItems;
+	}
+
+	private OrderItem assetToOrderItemMapping(Assets a, String action) {
+		OrderItem o = new OrderItem();
+		o.setAction(action);
+		o.setCustomerAgreedDate(new Date());
+		o.setProduct(a.getProduct());
+		o.setStatus(Status.Pending);
+		o.setSubStatus(Substatus.InProgress);
+		o.setPromIntegrationId(a.getPromotionInteg());
+		o.setServiceId(a.getServiceId());
+		return o;
 	}
 
 	@Override
 	public String addOrderItem(String orderNumber, Offers o, int cadAfter) throws Exception {
-		String orderId = "1-" + new Random().nextInt(10000);
-		if (MainController.WSDL_MODE) {
-			Create_spcOrder_spc_spcBT_spcDemo_Input input = new Create_spcOrder_spc_spcBT_spcDemo_Input();
-			input.setProduct_spcId("1-XHCR");
-			orderId = ((Create_spcOrder_spc_spcBT_spcDemo_Output) hitSiebel(input)).getOrderNumber();
-		}
-		List<OrderItem> orderItems = orderToOrderItemsMap.get(orderNumber);
-		Calendar c = Calendar.getInstance();
-		c.add(Calendar.DAY_OF_MONTH, cadAfter);
-		orderItems.add(new OrderItemBuilder().withNewOfferDetails(o, c.getTime()).build());
-		Offers discount = offerService.getDiscount(o.getPartNum());
-		if (discount != null)
-			orderItems.add(new OrderItemBuilder().withNewOfferDetails(discount, c.getTime()).build());
+		Create_spcOrder_spc_spcBT_spcDemo_Input input = new Create_spcOrder_spc_spcBT_spcDemo_Input();
+		input.setProduct_spcId("1-XHCR");
+		logger.info("Hitting siebel to search at url = " + url);
+		logger.info("with input = " + input.toString());
+		String orderId = ((Create_spcOrder_spc_spcBT_spcDemo_Output) hitSiebel(input)).getOrderNumber();
 
+		List<OrderItem> orderItems = getOrderItems(orderNumber);
+		orderItems.addAll(getOrderItems(orderNumber, o));
+		SearchServiceImpl.ORDER_ID = orderId;
 		return orderId;
+	}
 
+	@Override
+	public List<OrderItem> getOrderItems(String orderNumber, Offers o) {
+		List<OrderItem> orderItems = new ArrayList<>();
+		Assets a1 = new AssetBuilder(orderItems.size() + 1).withAssetDetails(orderNumber, o.getName())
+				.withContractDetails(new Date(), orderNumber, null).build();
+		orderItems.add(assetToOrderItemMapping(a1, Action.Add.val));
+		Offers discount = offerService.getDiscount(o.getPartNum());
+
+		SearchResult searchResult = SearchServiceImpl.searchResult.get(orderNumber);
+		Assets a2 = null;
+		if (discount != null) {
+			a2 = new AssetBuilder(orderItems.size() + 1).withAssetDetails(orderNumber, discount.getName())
+					.withContractDetails(new Date(), orderNumber, null).build();
+			orderItems.add(assetToOrderItemMapping(a1, Action.Add.val));
+		}
+		if (searchResult != null) {
+			List<Assets> assets = searchResult.getAssets();
+			assets.add(a1);
+			if (a2 != null)
+				assets.add(a2);
+		}
+		return orderItems;
 	}
 
 	@Override
 	protected java.io.Serializable hitSiebel(java.io.Serializable input) throws Exception {
-		return getSiebelService().create_spcOrder_spc_spcBT_spcDemo((Create_spcOrder_spc_spcBT_spcDemo_Input) input);
+
+		Create_spcOrder_spc_spcBT_spcDemo_Output output = getSiebelService()
+				.create_spcOrder_spc_spcBT_spcDemo((Create_spcOrder_spc_spcBT_spcDemo_Input) input);
+		logger.info("Received response from siebel = " + output.toString());
+		return output;
 	}
 
 	@Override
@@ -114,4 +128,5 @@ public class OrderServiceImpl extends
 		Create_spcOrder_spc_spcBT_spcDemo_ServiceLocator service = new Create_spcOrder_spc_spcBT_spcDemo_ServiceLocator();
 		return new Create_spcOrder_spc_spcBT_spcDemo_BindingStub(new URL(url), service);
 	}
+
 }

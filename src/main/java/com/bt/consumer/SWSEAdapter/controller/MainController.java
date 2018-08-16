@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class MainController {
 	private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
-	public static boolean WSDL_MODE = false; // risky code - just added for demo
-
 	@Value("${swse.user.name}")
 	private String userName;
 
@@ -33,17 +31,4 @@ public class MainController {
 				+ "6. /addOrderItem/{OrderNumber}/{cadAfter}\n";
 
 	}
-
-	/*
-	 * it should be post method but for demo keeping it GET
-	 */
-	@GetMapping("/toggleMode")
-	public String toggleMode() {
-		WSDL_MODE = !WSDL_MODE;
-		return "Now Running in " + (WSDL_MODE
-				? String.format("wsdl mode </br>username = %s</br>password = %s</br>sesstion type = %s</br>url = %s",
-						userName, password, sessionType, url)
-				: "stub mode - with in momory data only");
-	}
-
 }

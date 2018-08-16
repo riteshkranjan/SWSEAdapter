@@ -116,4 +116,11 @@ public class Create_spcOrder_spc_spcBT_spcDemo_Input  implements java.io.Seriali
             _javaType, _xmlType, typeDesc);
     }
 
+	@Override
+	public String toString() {
+		return "Create_spcOrder_spc_spcBT_spcDemo_Input [product_spcId=" + product_spcId + "]";
+	}
+    
+    
+
 }

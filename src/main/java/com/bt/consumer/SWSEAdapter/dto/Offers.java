@@ -53,5 +53,10 @@ public class Offers implements Serializable{
 	public void setPriceType(PriceType priceType) {
 		this.priceType = priceType;
 	}
+	@Override
+	public String toString() {
+		return "Offers [name=" + name + ", partNum=" + partNum + ", trackAsAsset=" + trackAsAsset + ", price=" + price
+				+ ", type=" + type + ", priceType=" + priceType + "]";
+	}
 
 }

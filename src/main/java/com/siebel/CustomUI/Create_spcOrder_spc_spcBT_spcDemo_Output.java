@@ -116,4 +116,11 @@ public class Create_spcOrder_spc_spcBT_spcDemo_Output  implements java.io.Serial
             _javaType, _xmlType, typeDesc);
     }
 
+	@Override
+	public String toString() {
+		return "Create_spcOrder_spc_spcBT_spcDemo_Output [orderNumber=" + orderNumber + "]";
+	}
+    
+    
+
 }

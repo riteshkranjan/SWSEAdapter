@@ -18,14 +18,14 @@ public class OfferServiceImplTest extends BaseTest{
 	@Test
 	public void testGetAllOffers() {
 		List<Offers> allOffers = service.getAllOffers();
-		Assert.assertEquals(9, allOffers.size());
+		Assert.assertEquals(3, allOffers.size());
 		Offers o = allOffers.get(0);
-		Assert.assertEquals(o.getName(), "Broadband Service");
-		Assert.assertEquals(o.getPartNum(), "S0123");
+		Assert.assertEquals(o.getName(), "Infinity offer 12 months 3 pounds disocunt");
+		Assert.assertEquals(o.getPartNum(), "S0129");
 		Assert.assertTrue(o.isTrackAsAsset());
 		Assert.assertTrue(0.0 == o.getPrice());
-		Assert.assertTrue(OfferType.Product == o.getType());
-		Assert.assertTrue(PriceType.OneOff == o.getPriceType());
+		Assert.assertTrue(OfferType.Promotion == o.getType());
+		Assert.assertTrue(PriceType.Recurring == o.getPriceType());
 
 	}
 	

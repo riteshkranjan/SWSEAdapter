@@ -46,5 +46,10 @@ public class Order implements Serializable{
 	public void setCustomerId(String customerId) {
 		this.customerId = customerId;
 	}
-
+	@Override
+	public String toString() {
+		return "Order [orderNumber=" + orderNumber + ", status=" + status + ", subStatus=" + subStatus
+				+ ", billingAccountNumber=" + billingAccountNumber + ", customerId=" + customerId + "]";
+	}
+	
 }

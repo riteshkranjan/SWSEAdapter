@@ -7,8 +7,17 @@
 
 package com.siebel.www.xml.BaseAccount;
 
+import java.util.Arrays;
+
 public class Account  implements java.io.Serializable {
-    private java.lang.String id;
+	
+	
+    @Override
+	public String toString() {
+		return "Account [listOfAssetMgmtAssetOrderMgmt=" + Arrays.toString(listOfAssetMgmtAssetOrderMgmt) + "]";
+	}
+
+	private java.lang.String id;
 
     private java.lang.String created;
 

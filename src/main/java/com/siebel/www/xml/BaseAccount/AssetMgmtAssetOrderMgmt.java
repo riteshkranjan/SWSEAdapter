@@ -8,7 +8,16 @@
 package com.siebel.www.xml.BaseAccount;
 
 public class AssetMgmtAssetOrderMgmt  implements java.io.Serializable {
-    private java.lang.String id;
+	
+	
+    @Override
+	public String toString() {
+		return "AssetMgmtAssetOrderMgmt [billingAccount=" + billingAccount + ", billingAccountId=" + billingAccountId
+				+ ", integrationId=" + integrationId + ", productName=" + productName + ", serviceAccountId="
+				+ serviceAccountId + "]";
+	}
+
+	private java.lang.String id;
 
     private java.lang.String created;
 

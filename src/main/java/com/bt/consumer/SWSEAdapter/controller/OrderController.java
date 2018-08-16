@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bt.consumer.SWSEAdapter.dto.Offers;
 import com.bt.consumer.SWSEAdapter.dto.OrderDetails;
+import com.bt.consumer.SWSEAdapter.dto.OrderItem;
 import com.bt.consumer.SWSEAdapter.service.OfferService;
 import com.bt.consumer.SWSEAdapter.service.OrderService;
 
@@ -50,5 +51,11 @@ public class OrderController {
 		logger.info(String.format("method addOrderItem called for  OrderNumber = %s and Customer Agreed after %d days",
 				orderNumber, cadAfter));
 		return orderService.addOrderItem(orderNumber, o, cadAfter < 0 ? 5 : cadAfter);
+	}
+	
+	@PostMapping("/generateOrderItem/{orderNumber}")
+	public List<OrderItem> generateOrderItem(@PathVariable final String orderNumber, @RequestBody final Offers o) {
+		logger.info("method generateOrderItem called with orderNumber = " + orderNumber);
+		return orderService.getOrderItems(orderNumber, o);
 	}
 }
