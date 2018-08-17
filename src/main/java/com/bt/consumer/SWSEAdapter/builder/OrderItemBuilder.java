@@ -7,6 +7,7 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.bt.consumer.SWSEAdapter.dto.Assets;
 import com.bt.consumer.SWSEAdapter.dto.Offers;
 import com.bt.consumer.SWSEAdapter.dto.OrderItem;
 import com.bt.consumer.SWSEAdapter.enums.Action;
@@ -23,6 +24,17 @@ public class OrderItemBuilder {
 
 	public OrderItem build() {
 		return this.o;
+	}
+	
+	public OrderItemBuilder withAssetAndAction(Assets a, String action) {
+		o.setAction(action);
+		o.setCustomerAgreedDate(new Date());
+		o.setProduct(a.getProduct());
+		o.setStatus(Status.Pending);
+		o.setSubStatus(Substatus.InProgress);
+		o.setPromIntegrationId(a.getPromotionInteg());
+		o.setServiceId(a.getServiceId());
+		return this;
 	}
 
 	public OrderItemBuilder withNewOfferDetails(Offers offer, Date cad) {

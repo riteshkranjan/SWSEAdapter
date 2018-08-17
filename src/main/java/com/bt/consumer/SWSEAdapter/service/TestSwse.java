@@ -1,4 +1,4 @@
-/*package com.bt.consumer.SWSEAdapter.service;
+package com.bt.consumer.SWSEAdapter.service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -27,8 +27,8 @@ public class TestSwse {
 	private static String headerSchemaUri = "http://siebel.com/webservices";
 
 	public static void main(String[] args) throws Exception {
-		//testSearchCustomer();
-		testAddOrder();
+		testSearchCustomer();
+		//testAddOrder();
 
 	}
 
@@ -57,12 +57,12 @@ public class TestSwse {
 		stub.setHeader(header);
 		stub.setHeader(headerSchemaUri, passwordTextTag, password);
 		stub.setHeader(headerSchemaUri, sessionTypeTag, sessionType);
-
+		System.out.println(input.toString());
 		Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output response = stub
 				.customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1(input);
-		Account account = response.getListOfBaseAccount()[0];
-		System.out.println(account.getCSN());
+		//Account account = response.getListOfBaseAccount()[0];
+		System.out.println(response.toString());
+		
 	}
 
 }
-*/

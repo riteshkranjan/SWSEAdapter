@@ -34,16 +34,16 @@ public class OrderServiceImplTest extends BaseTest {
 		Assert.assertEquals(Action.None.val, i.getAction());
 		Assert.assertEquals(Status.Pending, i.getStatus());
 		Assert.assertEquals(Substatus.InProgress, i.getSubStatus());
-		Assert.assertEquals("Mobile", i.getProduct());
-		Assert.assertEquals("1-PP47", i.getPromIntegrationId());
+		Assert.assertEquals("Broadband Service", i.getProduct());
+		Assert.assertEquals("1-XHTR", i.getPromIntegrationId());
 		Assert.assertEquals("1-AQP", i.getServiceId());
 
 		i = l.get(1);
 		Assert.assertEquals(Action.None.val, i.getAction());
 		Assert.assertEquals(Status.Pending, i.getStatus());
 		Assert.assertEquals(Substatus.InProgress, i.getSubStatus());
-		Assert.assertEquals("Contract Product", i.getProduct());
-		Assert.assertEquals("1-XHU9", i.getPromIntegrationId());
+		Assert.assertEquals("PSTN Service", i.getProduct());
+		Assert.assertEquals("1-XHU2", i.getPromIntegrationId());
 		Assert.assertEquals("1-AQP", i.getServiceId());
 
 	}
@@ -51,7 +51,7 @@ public class OrderServiceImplTest extends BaseTest {
 	@Test
 	public void testAddOrderItem() throws Exception {
 		search.search("123456789", "1-AQP");
-		int expectedOrderItemSize = 4;
+		int expectedOrderItemSize = 6;
 		OrderDetails assetDetails = service.getAssetDetails("1-AQP");
 		Order o = assetDetails.getOrder();
 		Assert.assertEquals("1-AQP", o.getOrderNumber());
@@ -70,11 +70,11 @@ public class OrderServiceImplTest extends BaseTest {
 		Assert.assertEquals(expectedOrderItemSize + 2, l.size());
 		validateOrderItems(l);
 
-		OrderItem i = l.get(4);
+		OrderItem i = l.get(expectedOrderItemSize);
 		Assert.assertEquals(Action.None.val, i.getAction());
 		Assert.assertEquals("Infinity offer 12 months 3 pounds disocunt", i.getProduct());
 
-		i = l.get(5);
+		i = l.get(expectedOrderItemSize + 1);
 		Assert.assertEquals(Action.None.val, i.getAction());
 		Assert.assertEquals("Infinity Disc 12 months 3 pounds", i.getProduct());
 	}

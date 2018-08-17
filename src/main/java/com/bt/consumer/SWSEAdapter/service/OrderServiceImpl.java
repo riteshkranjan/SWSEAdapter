@@ -15,14 +15,13 @@ import org.springframework.stereotype.Service;
 
 import com.bt.consumer.SWSEAdapter.builder.AssetBuilder;
 import com.bt.consumer.SWSEAdapter.builder.OrderBuilder;
+import com.bt.consumer.SWSEAdapter.builder.OrderItemBuilder;
 import com.bt.consumer.SWSEAdapter.dto.Assets;
 import com.bt.consumer.SWSEAdapter.dto.Offers;
 import com.bt.consumer.SWSEAdapter.dto.OrderDetails;
 import com.bt.consumer.SWSEAdapter.dto.OrderItem;
-import com.bt.consumer.SWSEAdapter.dto.SearchResult;
 import com.bt.consumer.SWSEAdapter.enums.Action;
-import com.bt.consumer.SWSEAdapter.enums.Status;
-import com.bt.consumer.SWSEAdapter.enums.Substatus;
+import com.bt.consumer.utils.ApplicationCache;
 import com.siebel.CustomUI.Create_spcOrder_spc_spcBT_spcDemo_BindingStub;
 import com.siebel.CustomUI.Create_spcOrder_spc_spcBT_spcDemo_Input;
 import com.siebel.CustomUI.Create_spcOrder_spc_spcBT_spcDemo_Output;
@@ -44,36 +43,12 @@ public class OrderServiceImpl extends
 	@Override
 	public OrderDetails getAssetDetails(String assetId) {
 		OrderDetails details = new OrderDetails();
-		List<OrderItem> orderItems = getOrderItems(assetId);
+		List<OrderItem> orderItems = ApplicationCache.getOrderItems(assetId);
 		details.setOrderItems(orderItems);
 		details.setOrder(new OrderBuilder()
-				.withOrderDetails("", "", SearchServiceImpl.ORDER_ID.equals("") ? assetId : SearchServiceImpl.ORDER_ID)
+				.withOrderDetails("", "", ApplicationCache.getOrderNumber(assetId))
 				.build());
 		return details;
-	}
-
-	private List<OrderItem> getOrderItems(String assetId) {
-		SearchResult searchResult = SearchServiceImpl.searchResult.get(assetId);
-		List<Assets> assets = searchResult.getAssets();
-
-		List<OrderItem> orderItems = new ArrayList<>();
-		for (Assets a : assets) {
-			OrderItem o = assetToOrderItemMapping(a, Action.None.val);
-			orderItems.add(o);
-		}
-		return orderItems;
-	}
-
-	private OrderItem assetToOrderItemMapping(Assets a, String action) {
-		OrderItem o = new OrderItem();
-		o.setAction(action);
-		o.setCustomerAgreedDate(new Date());
-		o.setProduct(a.getProduct());
-		o.setStatus(Status.Pending);
-		o.setSubStatus(Substatus.InProgress);
-		o.setPromIntegrationId(a.getPromotionInteg());
-		o.setServiceId(a.getServiceId());
-		return o;
 	}
 
 	@Override
@@ -84,9 +59,9 @@ public class OrderServiceImpl extends
 		logger.info("with input = " + input.toString());
 		String orderId = ((Create_spcOrder_spc_spcBT_spcDemo_Output) hitSiebel(input)).getOrderNumber();
 
-		List<OrderItem> orderItems = getOrderItems(orderNumber);
+		List<OrderItem> orderItems = ApplicationCache.getOrderItems(orderNumber);
 		orderItems.addAll(getOrderItems(orderNumber, o));
-		SearchServiceImpl.ORDER_ID = orderId;
+		ApplicationCache.ORDER_ID = orderId;
 		return orderId;
 	}
 
@@ -95,22 +70,17 @@ public class OrderServiceImpl extends
 		List<OrderItem> orderItems = new ArrayList<>();
 		Assets a1 = new AssetBuilder(orderItems.size() + 1).withAssetDetails(orderNumber, o.getName())
 				.withContractDetails(new Date(), orderNumber, null).build();
-		orderItems.add(assetToOrderItemMapping(a1, Action.Add.val));
+		orderItems.add(new OrderItemBuilder().withAssetAndAction(a1, Action.None.val).build());
 		Offers discount = offerService.getDiscount(o.getPartNum());
 
-		SearchResult searchResult = SearchServiceImpl.searchResult.get(orderNumber);
+		
 		Assets a2 = null;
 		if (discount != null) {
-			a2 = new AssetBuilder(orderItems.size() + 1).withAssetDetails(orderNumber, discount.getName())
+			a2 = new AssetBuilder(orderItems.size() + 2).withAssetDetails(orderNumber, discount.getName())
 					.withContractDetails(new Date(), orderNumber, null).build();
-			orderItems.add(assetToOrderItemMapping(a1, Action.Add.val));
+			orderItems.add(new OrderItemBuilder().withAssetAndAction(a2, Action.None.val).build());
 		}
-		if (searchResult != null) {
-			List<Assets> assets = searchResult.getAssets();
-			assets.add(a1);
-			if (a2 != null)
-				assets.add(a2);
-		}
+		ApplicationCache.updateSearchResult(orderNumber, a1, a2);
 		return orderItems;
 	}
 
