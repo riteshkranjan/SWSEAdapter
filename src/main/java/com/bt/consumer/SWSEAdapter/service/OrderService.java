@@ -10,7 +10,7 @@ public interface OrderService {
 
 	public OrderDetails getAssetDetails(String assetId);
 
-	public String addOrderItem(String orderNumber, Offers o, int cadAfter) throws Exception;
+	public String addOrderItem() throws Exception;
 	
 	public List<OrderItem> getOrderItems(String orderNumber, Offers o);
 

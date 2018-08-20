@@ -47,9 +47,14 @@ public class OrderServiceImplTest extends BaseTest {
 		Assert.assertEquals("1-AQP", i.getServiceId());
 
 	}
-
+	
 	@Test
 	public void testAddOrderItem() throws Exception {
+		Assert.assertNotNull(service.addOrderItem());
+	}
+
+	@Test
+	public void testGetOrderItems() throws Exception {
 		search.search("123456789", "1-AQP");
 		int expectedOrderItemSize = 6;
 		OrderDetails assetDetails = service.getAssetDetails("1-AQP");
@@ -62,8 +67,9 @@ public class OrderServiceImplTest extends BaseTest {
 		Offers offers = new OfferBuilder()
 				.withNameAndPartNum("Infinity offer 12 months 3 pounds disocunt", "S0129", OfferType.Product)
 				.withPricingDetails(10.0, true, PriceType.Recurring).build();
-		String newOrderId = service.addOrderItem("1-AQP", offers, 5);
-		System.out.println("new Order created at sieble : " + newOrderId);
+		List<OrderItem> orderItems = service.getOrderItems("1-AQP", offers);
+		
+		
 		assetDetails = service.getAssetDetails("1-AQP");
 		o = assetDetails.getOrder();
 		l = assetDetails.getOrderItems();
@@ -75,6 +81,14 @@ public class OrderServiceImplTest extends BaseTest {
 		Assert.assertEquals("Infinity offer 12 months 3 pounds disocunt", i.getProduct());
 
 		i = l.get(expectedOrderItemSize + 1);
+		Assert.assertEquals(Action.None.val, i.getAction());
+		Assert.assertEquals("Infinity Disc 12 months 3 pounds", i.getProduct());
+		
+		i = orderItems.get(0);
+		Assert.assertEquals(Action.None.val, i.getAction());
+		Assert.assertEquals("Infinity offer 12 months 3 pounds disocunt", i.getProduct());
+
+		i = orderItems.get(1);
 		Assert.assertEquals(Action.None.val, i.getAction());
 		Assert.assertEquals("Infinity Disc 12 months 3 pounds", i.getProduct());
 	}

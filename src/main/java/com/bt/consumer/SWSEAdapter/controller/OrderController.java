@@ -42,15 +42,7 @@ public class OrderController {
 	@PostMapping("/addOrderItem/{orderNumber}")
 	public String addOrderItem(@PathVariable final String orderNumber, @RequestBody final Offers o) throws Exception {
 		logger.info("method addOrderItem called for  OrderNumber = " + orderNumber);
-		return orderService.addOrderItem(orderNumber, o, 5);
-	}
-
-	@PostMapping("/addOrderItem/{orderNumber}/{cadAfter}")
-	public String addOrderItem(@PathVariable final String orderNumber, @PathVariable final int cadAfter,
-			@RequestBody final Offers o) throws Exception {
-		logger.info(String.format("method addOrderItem called for  OrderNumber = %s and Customer Agreed after %d days",
-				orderNumber, cadAfter));
-		return orderService.addOrderItem(orderNumber, o, cadAfter < 0 ? 5 : cadAfter);
+		return orderService.addOrderItem();
 	}
 	
 	@PostMapping("/generateOrderItem/{orderNumber}")

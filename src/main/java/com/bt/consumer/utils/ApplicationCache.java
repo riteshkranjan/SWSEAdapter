@@ -13,10 +13,10 @@ import com.bt.consumer.SWSEAdapter.enums.Action;
 
 public class ApplicationCache {
 
-	public static String ORDER_ID = "";
+	private static String ORDER_ID = "";
 
-	public static Map<String, SearchResult> searchResult = new HashMap<String, SearchResult>();
-
+	private static Map<String, SearchResult> searchResult = new HashMap<String, SearchResult>();
+	
 	public static List<OrderItem> getOrderItems(String assetId) {
 		SearchResult searchResult = ApplicationCache.searchResult.get(assetId);
 		List<Assets> assets = searchResult.getAssets();
@@ -44,5 +44,9 @@ public class ApplicationCache {
 
 	public static void updateOrderId(String billingActNum) {
 		ORDER_ID = billingActNum;
+	}
+	
+	public static void saveSearchResult(String assetId, SearchResult s) {
+		searchResult.put(assetId, s);
 	}
 }

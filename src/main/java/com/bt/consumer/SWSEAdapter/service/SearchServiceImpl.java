@@ -41,34 +41,43 @@ public class SearchServiceImpl extends
 	@Override
 	public SearchResult search(String phoneNumber, String billingActNum) throws Exception {
 		SearchResult s = new SearchResult();
+		//Prepare siebel customer search input
 		Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input input = new Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Input();
 		input.setBillingAccntId(billingActNum);
 		logger.info("Hitting siebel to search at url = " + url);
 		logger.info("with input = " + input.toString());
-		Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output response = (Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output) hitSiebel(
-				input);
+		Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output response = (Customer_spcAsset_spcSearch_spcWF_spc_spcBT_spcDemo_1_Output) 
+				hitSiebel(input);
 		if (response == null || response.getListOfBaseAccount() == null || response.getListOfBaseAccount().length == 0)
 			return s;
+		//Read account info from siebel response - for demo read only first account
 		Account account = response.getListOfBaseAccount()[0];
 		Customer c = new CustomerBuilder().withConsumer(account.getContactId()).build();
 		s.setCustomer(c);
+		//Read all assets from siebel response
 		AssetMgmtAssetOrderMgmt[] assets = account.getListOfAssetMgmtAssetOrderMgmt();
-		int i = 1;
+		int assetCounter = 1;
 		for (AssetMgmtAssetOrderMgmt asset : assets) {
-			Date d = null;
-			try {
-				sdf.parse(asset.getEffectiveEndDate());
-			} catch (ParseException e) {
-				logger.error("Contract end date is not in format dd/mm/yyyy so setting it null");
-			}
-			Assets a = new AssetBuilder(i++).withAssetDetails(asset.getServiceAccountId(), asset.getProductName())
+			//Iterate each siebel asset and build data transter object 
+			Date d = parseEffectiveEndDate(asset.getEffectiveEndDate());
+			Assets a = new AssetBuilder(assetCounter++).withAssetDetails(asset.getServiceAccountId(), asset.getProductName())
 					.withPromotionIntg(asset.getIntegrationId())
 					.withContractDetails(d, asset.getServiceAccountId(), asset.getBillingAccountId()).build();
 			s.getAssets().add(a);
 		}
-		ApplicationCache.searchResult.put(billingActNum, s);
+		ApplicationCache.saveSearchResult(billingActNum, s);
 		ApplicationCache.updateOrderId(billingActNum);
 		return s;
+	}
+
+	private Date parseEffectiveEndDate(String date) {
+		Date d = null;
+		try {
+			sdf.parse(date);
+		} catch (ParseException e) {
+			logger.error("Contract end date is not in format dd/mm/yyyy so setting it to null");
+		}
+		return d;
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package com.bt.consumer.SWSEAdapter.service;
+/*package com.bt.consumer.SWSEAdapter.service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -66,3 +66,4 @@ public class TestSwse {
 	}
 
 }
+*/

@@ -52,16 +52,12 @@ public class OrderServiceImpl extends
 	}
 
 	@Override
-	public String addOrderItem(String orderNumber, Offers o, int cadAfter) throws Exception {
+	public String addOrderItem() throws Exception {
 		Create_spcOrder_spc_spcBT_spcDemo_Input input = new Create_spcOrder_spc_spcBT_spcDemo_Input();
 		input.setProduct_spcId("1-XHCR");
 		logger.info("Hitting siebel to search at url = " + url);
 		logger.info("with input = " + input.toString());
 		String orderId = ((Create_spcOrder_spc_spcBT_spcDemo_Output) hitSiebel(input)).getOrderNumber();
-
-		List<OrderItem> orderItems = ApplicationCache.getOrderItems(orderNumber);
-		orderItems.addAll(getOrderItems(orderNumber, o));
-		ApplicationCache.ORDER_ID = orderId;
 		return orderId;
 	}
 
